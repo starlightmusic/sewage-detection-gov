@@ -7,190 +7,20 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: #f0f2f5;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
-.container {
-    display: flex;
-    height: 100vh;
-}
+/* ============ VIEW CONTAINERS ============ */
 
-.panel {
-    flex: 1;
+.view-container {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: white;
 }
 
-/* WhatsApp Panel Styles */
-.whatsapp-panel {
-    max-width: 500px;
-    border-right: 1px solid #e0e0e0;
-    background: #f0f2f5;
-}
+/* ============ PUBLIC VIEW ============ */
 
-.whatsapp-header {
-    background: #008069;
-    color: white;
-    padding: 10px 16px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.back-arrow {
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.profile-pic {
-    width: 40px;
-    height: 40px;
-    background: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-}
-
-.header-info {
-    flex: 1;
-}
-
-.contact-name {
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.contact-status {
-    font-size: 12px;
-    opacity: 0.8;
-}
-
-.whatsapp-chat {
-    flex: 1;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23e5ddd5" width="100" height="100"/><path d="M20 10 L30 20 M30 10 L20 20" stroke="%23d4cdc5" stroke-width="0.5" opacity="0.3"/></svg>');
-    background-color: #e5ddd5;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.date-divider {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.date-divider span {
-    background: #e1f4fb;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    color: #667781;
-}
-
-.message {
-    max-width: 65%;
-    margin-bottom: 8px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    position: relative;
-    animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.message-sent {
-    background: #d9fdd3;
-    margin-left: auto;
-    border-radius: 8px 0 8px 8px;
-}
-
-.message-received {
-    background: white;
-    margin-right: auto;
-    border-radius: 0 8px 8px 8px;
-}
-
-.message-text {
-    font-size: 14px;
-    line-height: 1.4;
-    color: #111;
-}
-
-.message-time {
-    font-size: 11px;
-    color: #667781;
-    text-align: right;
-    margin-top: 4px;
-}
-
-.message-image {
-    width: 100%;
-    border-radius: 8px;
-    margin-bottom: 4px;
-    cursor: pointer;
-}
-
-.message-location {
-    background: #dcf8c6;
-    padding: 8px;
-    border-radius: 4px;
-    margin-top: 4px;
-    font-size: 12px;
-}
-
-.location-icon {
-    display: inline-block;
-    margin-right: 4px;
-}
-
-.whatsapp-input {
-    padding: 10px;
-    background: #f0f2f5;
-}
-
-.action-btn {
-    width: 100%;
-    padding: 12px;
-    background: #008069;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.action-btn:hover {
-    background: #006d5b;
-}
-
-.action-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-/* Admin Portal Styles */
-.admin-panel {
-    background: #f8f9fa;
-}
-
-.admin-header {
+.public-header {
     background: linear-gradient(135deg, #ff9933 0%, #138808 50%, #000080 100%);
     color: white;
     padding: 20px 30px;
@@ -220,6 +50,256 @@ body {
     opacity: 0.9;
 }
 
+.admin-link-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-link-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.public-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+
+.complaint-form-container {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+}
+
+.complaint-form-container h2 {
+    color: #138808;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.form-description {
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #138808;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.upload-box {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #f8f9fa;
+}
+
+.upload-box:hover {
+    border-color: #138808;
+    background: #f0f8f0;
+}
+
+.upload-box.dragover {
+    border-color: #138808;
+    background: #e8f5e8;
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.upload-box p {
+    margin: 8px 0;
+    color: #333;
+}
+
+.upload-hint {
+    font-size: 12px;
+    color: #999;
+}
+
+.image-preview-box {
+    text-align: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.image-preview-box img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-submit-complaint {
+    width: 100%;
+    padding: 14px;
+    background: #138808;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-submit-complaint:hover {
+    background: #0f6b06;
+}
+
+/* ============ ADMIN LOGIN VIEW ============ */
+
+.login-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 100%;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header .emblem {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+.login-header h2 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.login-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+.login-hint {
+    background: #e3f2fd;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #1976d2;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background: #138808;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 10px;
+}
+
+.btn-login:hover {
+    background: #0f6b06;
+}
+
+.btn-back {
+    width: 100%;
+    padding: 12px;
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background: #e9ecef;
+}
+
+/* ============ ADMIN DASHBOARD VIEW ============ */
+
+.admin-header {
+    background: linear-gradient(135deg, #ff9933 0%, #138808 50%, #000080 100%);
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .admin-user {
     background: rgba(255, 255, 255, 0.2);
     padding: 8px 16px;
@@ -227,10 +307,27 @@ body {
     font-size: 14px;
 }
 
+.btn-logout {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
 .admin-content {
     flex: 1;
     padding: 30px;
     overflow-y: auto;
+    background: #f8f9fa;
 }
 
 .admin-stats {
@@ -279,7 +376,7 @@ body {
 
 .table-header {
     display: grid;
-    grid-template-columns: 80px 1fr 1fr 120px 150px 150px;
+    grid-template-columns: 80px 1fr 1.5fr 120px 120px 150px 180px;
     gap: 10px;
     padding: 12px;
     background: #f8f9fa;
@@ -303,7 +400,7 @@ body {
 
 .complaint-row {
     display: grid;
-    grid-template-columns: 80px 1fr 1fr 120px 150px 150px;
+    grid-template-columns: 80px 1fr 1.5fr 120px 120px 150px 180px;
     gap: 10px;
     padding: 15px 12px;
     border-bottom: 1px solid #f0f0f0;
@@ -331,14 +428,17 @@ body {
     color: #138808;
 }
 
-.complaint-location {
+.complaint-location,
+.complaint-description,
+.complaint-contact {
     font-size: 13px;
     color: #333;
 }
 
-.complaint-type {
-    font-size: 13px;
-    color: #666;
+.complaint-description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .status-badge {
@@ -369,6 +469,27 @@ body {
     color: #333;
 }
 
+.complaint-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-view {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-view:hover {
+    background: #5a6268;
+}
+
 .btn-assign, .btn-complete {
     padding: 6px 16px;
     border: none;
@@ -376,6 +497,7 @@ body {
     font-size: 12px;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .btn-assign {
@@ -396,79 +518,13 @@ body {
     background: #157347;
 }
 
-.btn-assign:disabled, .btn-complete:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+.completed-icon {
+    color: #198754;
+    font-size: 20px;
 }
 
-/* Instructions Overlay */
-.instructions-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
+/* ============ MODALS ============ */
 
-.instructions-content {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    max-width: 600px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.instructions-content h2 {
-    color: #138808;
-    margin-bottom: 15px;
-}
-
-.instructions-content h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.instructions-content p {
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 15px;
-}
-
-.instructions-content ol {
-    margin-left: 20px;
-    color: #333;
-}
-
-.instructions-content li {
-    margin-bottom: 10px;
-    line-height: 1.6;
-}
-
-.start-btn {
-    width: 100%;
-    padding: 12px;
-    background: #138808;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background 0.2s;
-}
-
-.start-btn:hover {
-    background: #0f6b06;
-}
-
-/* Completion Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -496,6 +552,10 @@ body {
     overflow-y: auto;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.3s ease-out;
+}
+
+.modal-content.large-modal {
+    max-width: 700px;
 }
 
 @keyframes slideUp {
@@ -575,19 +635,9 @@ body {
     background: #e8f5e8;
 }
 
-.upload-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-}
-
 .upload-area p {
     margin: 8px 0;
     color: #333;
-}
-
-.upload-hint {
-    font-size: 12px;
-    color: #999;
 }
 
 .image-preview {
@@ -618,47 +668,6 @@ body {
 
 .btn-change-image:hover {
     background: #5a6268;
-}
-
-.divider {
-    text-align: center;
-    margin: 24px 0;
-    color: #999;
-    position: relative;
-}
-
-.divider::before,
-.divider::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 40%;
-    height: 1px;
-    background: #e0e0e0;
-}
-
-.divider::before {
-    left: 0;
-}
-
-.divider::after {
-    right: 0;
-}
-
-.btn-use-sample {
-    width: 100%;
-    padding: 12px;
-    background: #0d6efd;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-use-sample:hover {
-    background: #0b5ed7;
 }
 
 .modal-footer {
@@ -705,37 +714,139 @@ body {
     cursor: not-allowed;
 }
 
-/* Responsive Design */
+.officer-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
 
-/* Tablet and below (768px) */
+/* Success Modal */
+.success-modal-content {
+    text-align: center;
+    padding: 40px;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: #198754;
+    color: white;
+    font-size: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.success-modal-content h2 {
+    color: #138808;
+    margin-bottom: 15px;
+}
+
+.success-modal-content p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.btn-ok {
+    padding: 12px 40px;
+    background: #138808;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.btn-ok:hover {
+    background: #0f6b06;
+}
+
+/* View Details Modal */
+.complaint-details {
+    font-size: 14px;
+}
+
+.detail-row {
+    display: flex;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #666;
+    min-width: 140px;
+}
+
+.detail-value {
+    flex: 1;
+    color: #333;
+}
+
+.complaint-id-value {
+    color: #138808;
+    font-weight: 600;
+}
+
+.detail-section {
+    margin-top: 20px;
+}
+
+.detail-section h4 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.detail-description {
+    color: #666;
+    line-height: 1.6;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.detail-image {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============ NOTIFICATIONS ============ */
+
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #198754;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 3000;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+
+.notification-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* ============ RESPONSIVE DESIGN ============ */
+
+/* Tablet (768px and below) */
 @media (max-width: 768px) {
-    body {
-        height: auto;
-        overflow: auto;
-    }
-
-    .container {
-        flex-direction: column;
-        height: auto;
-        min-height: 100vh;
-    }
-
-    .panel {
-        height: auto;
-        min-height: 50vh;
-    }
-
-    .whatsapp-panel {
-        max-width: 100%;
-        border-right: none;
-        border-bottom: 2px solid #e0e0e0;
-        min-height: 50vh;
-    }
-
-    .whatsapp-chat {
-        min-height: 40vh;
-    }
-
+    .public-header,
     .admin-header {
         padding: 15px 20px;
         flex-wrap: wrap;
@@ -752,6 +863,10 @@ body {
 
     .header-text p {
         font-size: 12px;
+    }
+
+    .complaint-form-container {
+        padding: 30px 20px;
     }
 
     .admin-content {
@@ -771,146 +886,49 @@ body {
         font-size: 24px;
     }
 
-    .stat-label {
-        font-size: 13px;
-    }
-
     .complaints-section {
         padding: 15px;
     }
 
-    .complaints-section h2 {
-        font-size: 16px;
+    .table-header {
+        grid-template-columns: 70px 1fr 1fr 110px 140px;
+        font-size: 12px;
+        gap: 8px;
     }
 
-    /* Make table scrollable horizontally on tablet */
-    .complaints-table {
-        overflow-x: auto;
-        display: block;
-    }
-
-    .table-header, .complaint-row {
-        grid-template-columns: 70px 1fr 1fr 110px 120px;
+    .complaint-row {
+        grid-template-columns: 70px 1fr 1fr 110px 140px;
         font-size: 12px;
         gap: 8px;
         padding: 10px;
     }
 
-    .col-type, .complaint-type {
+    .col-description,
+    .complaint-description,
+    .col-contact,
+    .complaint-contact {
         display: none;
     }
 
-    .btn-assign, .btn-complete {
-        padding: 8px 12px;
-        font-size: 11px;
-    }
-
-    /* Instructions modal */
-    .instructions-content {
+    .login-box {
         padding: 30px 20px;
-        max-width: 90%;
-        margin: 20px;
     }
 
-    .instructions-content h2 {
-        font-size: 20px;
-    }
-
-    .instructions-content h3 {
-        font-size: 16px;
-    }
-
-    .instructions-content p,
-    .instructions-content li {
-        font-size: 14px;
-    }
-
-    /* Completion modal */
     .modal-content {
         width: 95%;
-        max-height: 85vh;
     }
 
-    .modal-header {
-        padding: 15px 20px;
-    }
-
-    .modal-body {
-        padding: 20px 16px;
-    }
-
-    .upload-area {
-        padding: 30px 15px;
-    }
-
-    .upload-icon {
-        font-size: 40px;
-    }
-
-    .modal-footer {
-        padding: 12px 20px;
-        flex-wrap: wrap;
-    }
-
-    .btn-cancel, .btn-submit {
-        flex: 1;
-        min-width: 120px;
+    .notification-toast {
+        right: 10px;
+        left: 10px;
     }
 }
 
-/* Mobile devices (480px) */
+/* Mobile (480px and below) */
 @media (max-width: 480px) {
-    .whatsapp-header {
-        padding: 8px 12px;
-    }
-
-    .header-content {
-        gap: 8px;
-    }
-
-    .profile-pic {
-        width: 36px;
-        height: 36px;
-        font-size: 20px;
-    }
-
-    .contact-name {
-        font-size: 15px;
-    }
-
-    .contact-status {
-        font-size: 11px;
-    }
-
-    .whatsapp-chat {
-        padding: 12px;
-    }
-
-    .message {
-        max-width: 85%;
-        padding: 6px 10px;
-    }
-
-    .message-text {
-        font-size: 13px;
-    }
-
-    .whatsapp-input {
-        padding: 8px;
-    }
-
-    .action-btn {
-        padding: 14px;
-        font-size: 15px;
-        font-weight: 500;
-    }
-
+    .public-header,
     .admin-header {
         padding: 12px 15px;
-    }
-
-    .header-logo {
-        gap: 10px;
     }
 
     .emblem {
@@ -925,9 +943,22 @@ body {
         font-size: 11px;
     }
 
-    .admin-user {
-        font-size: 12px;
+    .admin-link-btn,
+    .btn-logout {
         padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .complaint-form-container {
+        padding: 20px 16px;
+    }
+
+    .complaint-form-container h2 {
+        font-size: 20px;
+    }
+
+    .form-description {
+        font-size: 14px;
     }
 
     .admin-content {
@@ -951,10 +982,6 @@ body {
     .stat-number {
         font-size: 28px;
         margin-bottom: 0;
-    }
-
-    .stat-label {
-        font-size: 12px;
     }
 
     .complaints-section {
@@ -1009,8 +1036,11 @@ body {
     }
 
     .complaint-location,
+    .complaint-description,
+    .complaint-contact,
     .assigned-officer {
         font-size: 12px;
+        display: block !important;
     }
 
     .status-badge {
@@ -1018,61 +1048,39 @@ body {
         padding: 3px 10px;
     }
 
-    .btn-assign, .btn-complete {
+    .complaint-actions {
+        flex-direction: column;
         width: 100%;
-        margin-top: 8px;
+        gap: 6px;
+    }
+
+    .btn-view,
+    .btn-assign,
+    .btn-complete {
+        width: 100%;
+        margin-top: 4px;
         padding: 10px 16px;
         font-size: 13px;
         font-weight: 500;
     }
 
-    .no-complaints {
-        padding: 40px 15px;
-        font-size: 13px;
+    .login-box {
+        padding: 30px 20px;
     }
 
-    /* Instructions modal - full screen on mobile */
-    .instructions-content {
-        padding: 20px 16px;
-        max-width: 95%;
-        margin: 10px;
-        max-height: 90vh;
-        overflow-y: auto;
+    .login-header .emblem {
+        font-size: 48px;
     }
 
-    .instructions-content h2 {
-        font-size: 18px;
-        margin-bottom: 12px;
-    }
-
-    .instructions-content h3 {
-        font-size: 15px;
-        margin-top: 15px;
-        margin-bottom: 8px;
-    }
-
-    .instructions-content p {
-        font-size: 13px;
-        margin-bottom: 12px;
-    }
-
-    .instructions-content li {
-        font-size: 13px;
-        margin-bottom: 8px;
-    }
-
-    .start-btn {
-        padding: 14px;
-        font-size: 15px;
-        margin-top: 15px;
-    }
-
-    /* Completion modal - optimized for mobile */
     .modal-content {
         width: 100%;
         max-width: 100%;
         max-height: 100vh;
         border-radius: 0;
+    }
+
+    .modal-content.large-modal {
+        max-width: 100%;
     }
 
     .modal-header {
@@ -1083,19 +1091,8 @@ body {
         font-size: 16px;
     }
 
-    .modal-close {
-        font-size: 24px;
-        width: 28px;
-        height: 28px;
-    }
-
     .modal-body {
         padding: 16px;
-    }
-
-    .modal-body > p {
-        font-size: 13px;
-        margin-bottom: 16px;
     }
 
     .upload-area {
@@ -1104,39 +1101,6 @@ body {
 
     .upload-icon {
         font-size: 36px;
-        margin-bottom: 8px;
-    }
-
-    .upload-area p {
-        font-size: 13px;
-        margin: 6px 0;
-    }
-
-    .upload-hint {
-        font-size: 11px;
-    }
-
-    .image-preview {
-        padding: 16px;
-    }
-
-    .image-preview img {
-        max-height: 250px;
-    }
-
-    .btn-change-image {
-        padding: 10px 16px;
-        font-size: 12px;
-    }
-
-    .divider {
-        margin: 20px 0;
-        font-size: 13px;
-    }
-
-    .btn-use-sample {
-        padding: 14px;
-        font-size: 13px;
     }
 
     .modal-footer {
@@ -1144,66 +1108,31 @@ body {
         flex-direction: column;
     }
 
-    .btn-cancel, .btn-submit {
+    .btn-cancel,
+    .btn-submit {
         width: 100%;
         padding: 12px 20px;
         font-size: 15px;
     }
-}
 
-/* Small mobile devices (360px) */
-@media (max-width: 360px) {
-    .whatsapp-header {
-        padding: 6px 10px;
+    .success-modal-content {
+        padding: 30px 20px;
     }
 
-    .profile-pic {
-        width: 32px;
-        height: 32px;
-        font-size: 18px;
+    .success-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 36px;
     }
 
-    .contact-name {
-        font-size: 14px;
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
     }
 
-    .emblem {
-        font-size: 24px;
-    }
-
-    .header-text h1 {
-        font-size: 14px;
-    }
-
-    .header-text p {
-        font-size: 10px;
-    }
-
-    .admin-stats {
-        gap: 10px;
-    }
-
-    .stat-card {
-        padding: 12px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-    }
-
-    .complaint-row {
-        padding: 10px;
-    }
-
-    .instructions-content {
-        padding: 16px 12px;
-    }
-
-    .modal-body {
-        padding: 12px;
+    .detail-label {
+        min-width: auto;
+        font-size: 12px;
     }
 }

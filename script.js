@@ -1,52 +1,254 @@
 // Application State
 let state = {
-    currentComplaint: null,
     complaints: [],
     complaintCounter: 1000,
+    currentAssignmentIndex: null,
     currentCompletionIndex: null,
-    selectedCompletionImage: null
+    selectedCompletionImage: null,
+    isAdminLoggedIn: false
 };
 
-// Close instructions overlay
-function closeInstructions() {
-    document.getElementById('instructions').style.display = 'none';
+// Admin credentials (in production, this should be server-side)
+const ADMIN_CREDENTIALS = {
+    username: 'admin',
+    password: 'admin123'
+};
+
+// Initialize app
+document.addEventListener('DOMContentLoaded', () => {
+    loadComplaintsFromStorage();
+    setupEventListeners();
+
+    // Check if admin is logged in
+    const adminLoggedIn = sessionStorage.getItem('adminLoggedIn');
+    if (adminLoggedIn === 'true') {
+        state.isAdminLoggedIn = true;
+        showAdminDashboard();
+    }
+});
+
+// ============ DATA PERSISTENCE ============
+
+function saveComplaintsToStorage() {
+    localStorage.setItem('complaints', JSON.stringify(state.complaints));
+    localStorage.setItem('complaintCounter', state.complaintCounter.toString());
 }
 
-// Helper function to format time
-function getCurrentTime() {
-    const now = new Date();
-    return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+function loadComplaintsFromStorage() {
+    const savedComplaints = localStorage.getItem('complaints');
+    const savedCounter = localStorage.getItem('complaintCounter');
+
+    if (savedComplaints) {
+        state.complaints = JSON.parse(savedComplaints);
+    }
+
+    if (savedCounter) {
+        state.complaintCounter = parseInt(savedCounter);
+    }
 }
 
-// Helper function to add WhatsApp message
-function addWhatsAppMessage(text, type, hasImage = false, imageUrl = '', location = '') {
-    const chatContainer = document.getElementById('whatsapp-chat');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message message-${type}`;
+// ============ VIEW NAVIGATION ============
 
-    let content = '';
-
-    if (hasImage && imageUrl) {
-        content += `<img src="${imageUrl}" alt="Complaint Image" class="message-image">`;
-    }
-
-    if (text) {
-        content += `<div class="message-text">${text}</div>`;
-    }
-
-    if (location) {
-        content += `<div class="message-location"><span class="location-icon">📍</span>${location}</div>`;
-    }
-
-    content += `<div class="message-time">${getCurrentTime()}</div>`;
-
-    messageDiv.innerHTML = content;
-    chatContainer.appendChild(messageDiv);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+function showPublicView() {
+    document.getElementById('public-view').style.display = 'block';
+    document.getElementById('admin-login-view').style.display = 'none';
+    document.getElementById('admin-dashboard-view').style.display = 'none';
 }
 
-// Helper function to update stats
-function updateStats() {
+function showAdminLogin() {
+    document.getElementById('public-view').style.display = 'none';
+    document.getElementById('admin-login-view').style.display = 'block';
+    document.getElementById('admin-dashboard-view').style.display = 'none';
+}
+
+function showAdminDashboard() {
+    document.getElementById('public-view').style.display = 'none';
+    document.getElementById('admin-login-view').style.display = 'none';
+    document.getElementById('admin-dashboard-view').style.display = 'block';
+
+    updateAdminStats();
+    renderComplaintsTable();
+}
+
+function logout() {
+    state.isAdminLoggedIn = false;
+    sessionStorage.removeItem('adminLoggedIn');
+    showPublicView();
+
+    // Clear login form
+    document.getElementById('admin-login-form').reset();
+}
+
+// ============ EVENT LISTENERS ============
+
+function setupEventListeners() {
+    // Public complaint form
+    const complaintForm = document.getElementById('complaint-form');
+    complaintForm.addEventListener('submit', handleComplaintSubmit);
+
+    // Public image upload
+    const publicUploadBox = document.getElementById('public-upload-box');
+    const publicImageUpload = document.getElementById('public-image-upload');
+
+    publicUploadBox.addEventListener('click', () => {
+        publicImageUpload.click();
+    });
+
+    publicImageUpload.addEventListener('change', (e) => {
+        handlePublicImageUpload(e);
+    });
+
+    // Drag and drop for public upload
+    publicUploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        publicUploadBox.classList.add('dragover');
+    });
+
+    publicUploadBox.addEventListener('dragleave', () => {
+        publicUploadBox.classList.remove('dragover');
+    });
+
+    publicUploadBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        publicUploadBox.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            handleImageFile(file, 'public');
+        }
+    });
+
+    // Admin login form
+    const adminLoginForm = document.getElementById('admin-login-form');
+    adminLoginForm.addEventListener('submit', handleAdminLogin);
+
+    // Completion image upload
+    const uploadArea = document.getElementById('upload-area');
+    const completionImageUpload = document.getElementById('completion-image-upload');
+
+    uploadArea.addEventListener('click', () => {
+        completionImageUpload.click();
+    });
+
+    completionImageUpload.addEventListener('change', (e) => {
+        handleCompletionImageUpload(e);
+    });
+
+    // Drag and drop for completion upload
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            handleImageFile(file, 'completion');
+        }
+    });
+}
+
+// ============ PUBLIC COMPLAINT SUBMISSION ============
+
+function handlePublicImageUpload(e) {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+        handleImageFile(file, 'public');
+    }
+}
+
+function handleImageFile(file, type) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        if (type === 'public') {
+            showPublicImagePreview(event.target.result);
+        } else if (type === 'completion') {
+            showCompletionImagePreview(event.target.result);
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+function showPublicImagePreview(imageSrc) {
+    document.getElementById('public-upload-box').style.display = 'none';
+    document.getElementById('public-image-preview').style.display = 'block';
+    document.getElementById('public-preview-img').src = imageSrc;
+}
+
+function changePublicImage() {
+    document.getElementById('public-image-upload').click();
+}
+
+function handleComplaintSubmit(e) {
+    e.preventDefault();
+
+    const location = document.getElementById('complaint-location').value;
+    const description = document.getElementById('complaint-description').value;
+    const contact = document.getElementById('complaint-contact').value;
+    const image = document.getElementById('public-preview-img').src;
+
+    if (!image) {
+        alert('Please upload a photo of the issue');
+        return;
+    }
+
+    // Create complaint
+    const complaint = {
+        id: state.complaintCounter++,
+        location: location,
+        description: description,
+        contact: contact,
+        status: 'pending',
+        assignedTo: null,
+        beforeImage: image,
+        afterImage: null,
+        submittedAt: new Date().toISOString(),
+        completedAt: null
+    };
+
+    state.complaints.push(complaint);
+    saveComplaintsToStorage();
+
+    // Show success modal
+    document.getElementById('complaint-id-display').textContent = '#' + complaint.id;
+    document.getElementById('success-modal').classList.add('active');
+
+    // Reset form
+    document.getElementById('complaint-form').reset();
+    document.getElementById('public-upload-box').style.display = 'block';
+    document.getElementById('public-image-preview').style.display = 'none';
+    document.getElementById('public-preview-img').src = '';
+}
+
+function closeSuccessModal() {
+    document.getElementById('success-modal').classList.remove('active');
+}
+
+// ============ ADMIN AUTHENTICATION ============
+
+function handleAdminLogin(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+
+    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+        state.isAdminLoggedIn = true;
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        showAdminDashboard();
+    } else {
+        alert('Invalid credentials. Please try again.');
+    }
+}
+
+// ============ ADMIN DASHBOARD ============
+
+function updateAdminStats() {
     const total = state.complaints.length;
     const pending = state.complaints.filter(c => c.status === 'pending').length;
     const processing = state.complaints.filter(c => c.status === 'processing').length;
@@ -58,7 +260,6 @@ function updateStats() {
     document.getElementById('completed-complaints').textContent = completed;
 }
 
-// Helper function to render complaints table
 function renderComplaintsTable() {
     const tableBody = document.getElementById('complaints-list');
 
@@ -69,7 +270,11 @@ function renderComplaintsTable() {
 
     tableBody.innerHTML = '';
 
-    state.complaints.forEach((complaint, index) => {
+    // Sort complaints by ID (newest first)
+    const sortedComplaints = [...state.complaints].sort((a, b) => b.id - a.id);
+
+    sortedComplaints.forEach((complaint, index) => {
+        const actualIndex = state.complaints.findIndex(c => c.id === complaint.id);
         const row = document.createElement('div');
         row.className = 'complaint-row';
 
@@ -85,130 +290,114 @@ function renderComplaintsTable() {
 
         let actionButton = '';
         if (complaint.status === 'pending') {
-            actionButton = `<button class="btn-assign" onclick="assignComplaint(${index})">Assign</button>`;
+            actionButton = `<button class="btn-assign" onclick="openAssignModal(${actualIndex})">Assign</button>`;
         } else if (complaint.status === 'processing') {
-            actionButton = `<button class="btn-complete" onclick="completeComplaint(${index})">Mark Complete</button>`;
+            actionButton = `<button class="btn-complete" onclick="openCompletionModal(${actualIndex})">Mark Complete</button>`;
         } else {
-            actionButton = `<span style="color: #198754; font-size: 20px;">✓</span>`;
+            actionButton = `<span class="completed-icon">✓</span>`;
         }
+
+        const shortDescription = complaint.description.length > 50
+            ? complaint.description.substring(0, 50) + '...'
+            : complaint.description;
 
         row.innerHTML = `
             <div class="complaint-id" data-label="ID:">#${complaint.id}</div>
             <div class="complaint-location" data-label="Location:">${complaint.location}</div>
-            <div class="complaint-type" data-label="Type:">${complaint.type}</div>
+            <div class="complaint-description" data-label="Description:" title="${complaint.description}">${shortDescription}</div>
+            <div class="complaint-contact" data-label="Contact:">${complaint.contact}</div>
             <div data-label="Status:"><span class="status-badge ${statusClass}">${statusText}</span></div>
             <div class="assigned-officer" data-label="Assigned To:">${complaint.assignedTo || '-'}</div>
-            <div data-label="Action:">${actionButton}</div>
+            <div class="complaint-actions" data-label="Action:">
+                <button class="btn-view" onclick="viewComplaint(${actualIndex})" title="View Details">👁️</button>
+                ${actionButton}
+            </div>
         `;
 
         tableBody.appendChild(row);
     });
 }
 
-// Step 1: User sends complaint
-function sendComplaint() {
-    const sendBtn = document.getElementById('send-complaint');
-    sendBtn.disabled = true;
-    sendBtn.textContent = 'Sending...';
+// ============ OFFICER ASSIGNMENT ============
 
-    // Create SVG image for sewage problem
-    const sewageBeforeImage = createSewageBeforeImage();
-
-    setTimeout(() => {
-        // Add user message with image and location
-        addWhatsAppMessage(
-            'There is sewage overflowing on the street. Please help!',
-            'sent',
-            true,
-            sewageBeforeImage,
-            'Mayiladuthurai, Tamil Nadu, India'
-        );
-
-        // Create complaint in system
-        const complaint = {
-            id: state.complaintCounter++,
-            location: 'Mayiladuthurai, Tamil Nadu',
-            type: 'Sewage Overflow',
-            status: 'pending',
-            assignedTo: null,
-            beforeImage: sewageBeforeImage,
-            afterImage: null
-        };
-
-        state.complaints.push(complaint);
-        state.currentComplaint = complaint;
-
-        // Update portal
-        updateStats();
-        renderComplaintsTable();
-
-        // Send automated response
-        setTimeout(() => {
-            addWhatsAppMessage(
-                '✅ Thank you for your complaint. Your issue has been registered with ID #' + complaint.id + ' for Mayiladuthurai location.\n\nWe will track the resolution and notify you once it is completed.',
-                'received'
-            );
-
-            sendBtn.textContent = '✓ Complaint Sent';
-        }, 1500);
-    }, 1000);
+function openAssignModal(index) {
+    state.currentAssignmentIndex = index;
+    document.getElementById('officer-select').value = '';
+    document.getElementById('assign-modal').classList.add('active');
 }
 
-// Step 2: Admin assigns complaint
-function assignComplaint(index) {
-    const complaint = state.complaints[index];
+function closeAssignModal() {
+    document.getElementById('assign-modal').classList.remove('active');
+    state.currentAssignmentIndex = null;
+}
+
+function confirmAssignment() {
+    const officer = document.getElementById('officer-select').value;
+
+    if (!officer) {
+        alert('Please select an officer');
+        return;
+    }
+
+    if (state.currentAssignmentIndex === null) return;
+
+    const complaint = state.complaints[state.currentAssignmentIndex];
     complaint.status = 'processing';
-    complaint.assignedTo = 'Sanitation Officer Ravi Kumar';
+    complaint.assignedTo = officer;
 
-    updateStats();
+    saveComplaintsToStorage();
+    updateAdminStats();
     renderComplaintsTable();
+    closeAssignModal();
 
-    // Show notification
-    showNotification('Complaint #' + complaint.id + ' assigned to ' + complaint.assignedTo);
+    showNotification('Complaint #' + complaint.id + ' assigned to ' + officer);
 }
 
-// Step 3: Officer completes complaint - Opens modal
-function completeComplaint(index) {
+// ============ COMPLAINT COMPLETION ============
+
+function openCompletionModal(index) {
     state.currentCompletionIndex = index;
     state.selectedCompletionImage = null;
 
     // Reset modal state
     document.getElementById('upload-area').style.display = 'block';
-    document.getElementById('image-preview').style.display = 'none';
-    document.getElementById('preview-img').src = '';
+    document.getElementById('completion-image-preview').style.display = 'none';
+    document.getElementById('completion-preview-img').src = '';
     document.getElementById('btn-submit-completion').disabled = true;
 
     // Show modal
     document.getElementById('completion-modal').classList.add('active');
 }
 
-// Close completion modal
 function closeCompletionModal() {
     document.getElementById('completion-modal').classList.remove('active');
     state.currentCompletionIndex = null;
     state.selectedCompletionImage = null;
 }
 
-// Use sample image
-function useSampleImage() {
-    state.selectedCompletionImage = createSewageAfterImage();
-    showImagePreview(state.selectedCompletionImage);
+function handleCompletionImageUpload(e) {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            showCompletionImagePreview(event.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
 }
 
-// Change image
-function changeImage() {
-    document.getElementById('image-upload').click();
-}
-
-// Show image preview
-function showImagePreview(imageSrc) {
+function showCompletionImagePreview(imageSrc) {
+    state.selectedCompletionImage = imageSrc;
     document.getElementById('upload-area').style.display = 'none';
-    document.getElementById('image-preview').style.display = 'block';
-    document.getElementById('preview-img').src = imageSrc;
+    document.getElementById('completion-image-preview').style.display = 'block';
+    document.getElementById('completion-preview-img').src = imageSrc;
     document.getElementById('btn-submit-completion').disabled = false;
 }
 
-// Submit completion with image
+function changeCompletionImage() {
+    document.getElementById('completion-image-upload').click();
+}
+
 function submitCompletion() {
     if (state.currentCompletionIndex === null || !state.selectedCompletionImage) {
         return;
@@ -217,194 +406,108 @@ function submitCompletion() {
     const complaint = state.complaints[state.currentCompletionIndex];
     complaint.status = 'completed';
     complaint.afterImage = state.selectedCompletionImage;
+    complaint.completedAt = new Date().toISOString();
 
-    updateStats();
+    saveComplaintsToStorage();
+    updateAdminStats();
     renderComplaintsTable();
-
-    // Close modal
     closeCompletionModal();
-
-    // Send WhatsApp notification to user
-    setTimeout(() => {
-        addWhatsAppMessage(
-            '🎉 Great news! Your complaint #' + complaint.id + ' has been resolved.\n\nThe sewage issue at your location has been fixed. Please see the attached photo for confirmation.',
-            'received',
-            true,
-            complaint.afterImage
-        );
-
-        // User sends thank you message
-        setTimeout(() => {
-            addWhatsAppMessage(
-                'Thank you so much! The area is clean now. Great work! 🙏',
-                'sent'
-            );
-        }, 2000);
-    }, 1000);
 
     showNotification('Complaint #' + complaint.id + ' marked as completed');
 }
 
-// Show notification
-function showNotification(message) {
-    // Create a simple toast notification
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #198754;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 1000;
-        animation: slideInRight 0.3s ease-out;
+// ============ VIEW COMPLAINT DETAILS ============
+
+function viewComplaint(index) {
+    const complaint = state.complaints[index];
+
+    const submittedDate = new Date(complaint.submittedAt).toLocaleString();
+    const completedDate = complaint.completedAt ? new Date(complaint.completedAt).toLocaleString() : 'Not completed';
+
+    let statusClass = 'status-pending';
+    let statusText = 'Pending';
+    if (complaint.status === 'processing') {
+        statusClass = 'status-processing';
+        statusText = 'In Process';
+    } else if (complaint.status === 'completed') {
+        statusClass = 'status-completed';
+        statusText = 'Completed';
+    }
+
+    let afterImageHTML = '';
+    if (complaint.afterImage) {
+        afterImageHTML = `
+            <div class="detail-section">
+                <h4>After Photo (Resolved)</h4>
+                <img src="${complaint.afterImage}" alt="After Photo" class="detail-image">
+            </div>
+        `;
+    }
+
+    const detailsHTML = `
+        <div class="complaint-details">
+            <div class="detail-row">
+                <div class="detail-label">Complaint ID:</div>
+                <div class="detail-value complaint-id-value">#${complaint.id}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Status:</div>
+                <div class="detail-value"><span class="status-badge ${statusClass}">${statusText}</span></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Location:</div>
+                <div class="detail-value">${complaint.location}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Contact:</div>
+                <div class="detail-value">${complaint.contact}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Assigned To:</div>
+                <div class="detail-value">${complaint.assignedTo || 'Not assigned'}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Submitted:</div>
+                <div class="detail-value">${submittedDate}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Completed:</div>
+                <div class="detail-value">${completedDate}</div>
+            </div>
+            <div class="detail-section">
+                <h4>Description</h4>
+                <p class="detail-description">${complaint.description}</p>
+            </div>
+            <div class="detail-section">
+                <h4>Before Photo (Issue Reported)</h4>
+                <img src="${complaint.beforeImage}" alt="Before Photo" class="detail-image">
+            </div>
+            ${afterImageHTML}
+        </div>
     `;
+
+    document.getElementById('complaint-details-content').innerHTML = detailsHTML;
+    document.getElementById('view-complaint-modal').classList.add('active');
+}
+
+function closeViewModal() {
+    document.getElementById('view-complaint-modal').classList.remove('active');
+}
+
+// ============ UTILITY FUNCTIONS ============
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification-toast';
     notification.textContent = message;
     document.body.appendChild(notification);
 
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        notification.classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
-
-// Create SVG image for sewage before (problem state)
-function createSewageBeforeImage() {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-            <rect fill="#87CEEB" width="400" height="200"/>
-            <rect fill="#666" y="200" width="400" height="100"/>
-            <rect fill="#fff" y="245" x="20" width="40" height="10" opacity="0.7"/>
-            <rect fill="#fff" y="245" x="80" width="40" height="10" opacity="0.7"/>
-            <rect fill="#fff" y="245" x="140" width="40" height="10" opacity="0.7"/>
-            <rect fill="#fff" y="245" x="200" width="40" height="10" opacity="0.7"/>
-            <rect fill="#fff" y="245" x="260" width="40" height="10" opacity="0.7"/>
-            <rect fill="#fff" y="245" x="320" width="40" height="10" opacity="0.7"/>
-            <rect fill="#8B4513" x="20" y="120" width="100" height="80"/>
-            <rect fill="#333" x="35" y="140" width="20" height="25"/>
-            <rect fill="#333" x="75" y="140" width="20" height="25"/>
-            <rect fill="#654321" x="30" y="175" width="60" height="25"/>
-            <rect fill="#8B4513" x="330" y="160" width="15" height="40"/>
-            <circle fill="#228B22" cx="337" cy="150" r="30"/>
-            <ellipse fill="#4a3f35" cx="200" cy="250" rx="80" ry="30" opacity="0.8"/>
-            <ellipse fill="#3d3328" cx="180" cy="255" rx="60" ry="25" opacity="0.6"/>
-            <ellipse fill="#6b5d4f" cx="220" cy="260" rx="50" ry="20" opacity="0.7"/>
-            <path d="M 200 250 Q 180 270 160 280" stroke="#3d3328" stroke-width="8" fill="none" opacity="0.6"/>
-            <path d="M 210 255 Q 230 275 250 285" stroke="#3d3328" stroke-width="6" fill="none" opacity="0.6"/>
-            <circle fill="#222" cx="200" cy="230" r="15"/>
-            <circle fill="#444" cx="200" cy="230" r="12"/>
-            <polygon fill="#FFD700" points="350,210 340,230 360,230" stroke="#333" stroke-width="2"/>
-            <text x="350" y="227" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">!</text>
-            <text x="200" y="290" font-size="12" font-weight="bold" text-anchor="middle" fill="#ff0000">SEWAGE OVERFLOW</text>
-        </svg>`;
-    return 'data:image/svg+xml,' + encodeURIComponent(svg);
-}
-
-// Create SVG image for sewage after (resolved state)
-function createSewageAfterImage() {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-            <rect fill="#87CEEB" width="400" height="200"/>
-            <circle fill="#FFD700" cx="350" cy="50" r="30"/>
-            <rect fill="#808080" y="200" width="400" height="100"/>
-            <rect fill="#fff" y="245" x="20" width="40" height="10"/>
-            <rect fill="#fff" y="245" x="80" width="40" height="10"/>
-            <rect fill="#fff" y="245" x="140" width="40" height="10"/>
-            <rect fill="#fff" y="245" x="200" width="40" height="10"/>
-            <rect fill="#fff" y="245" x="260" width="40" height="10"/>
-            <rect fill="#fff" y="245" x="320" width="40" height="10"/>
-            <rect fill="#8B4513" x="20" y="120" width="100" height="80"/>
-            <rect fill="#4da6ff" x="35" y="140" width="20" height="25"/>
-            <rect fill="#4da6ff" x="75" y="140" width="20" height="25"/>
-            <rect fill="#654321" x="30" y="175" width="60" height="25"/>
-            <rect fill="#8B4513" x="330" y="160" width="15" height="40"/>
-            <circle fill="#32CD32" cx="337" cy="150" r="30"/>
-            <circle fill="#555" cx="200" cy="240" r="18"/>
-            <circle fill="#666" cx="200" cy="240" r="15"/>
-            <circle fill="#777" cx="200" cy="240" r="5"/>
-            <line x1="195" y1="240" x2="205" y2="240" stroke="#888" stroke-width="1"/>
-            <line x1="200" y1="235" x2="200" y2="245" stroke="#888" stroke-width="1"/>
-            <circle fill="#22C55E" cx="350" cy="220" r="25"/>
-            <path d="M 340 220 L 347 227 L 360 210" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
-            <text x="200" y="290" font-size="12" font-weight="bold" text-anchor="middle" fill="#22C55E">CLEANED</text>
-        </svg>`;
-    return 'data:image/svg+xml,' + encodeURIComponent(svg);
-}
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('send-complaint').addEventListener('click', sendComplaint);
-
-    // Image upload functionality
-    const uploadArea = document.getElementById('upload-area');
-    const imageUpload = document.getElementById('image-upload');
-
-    // Click to upload
-    uploadArea.addEventListener('click', () => {
-        imageUpload.click();
-    });
-
-    // Handle file selection
-    imageUpload.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                state.selectedCompletionImage = event.target.result;
-                showImagePreview(state.selectedCompletionImage);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Drag and drop functionality
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                state.selectedCompletionImage = event.target.result;
-                showImagePreview(state.selectedCompletionImage);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-});
-
-// Add CSS animation for notifications
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
