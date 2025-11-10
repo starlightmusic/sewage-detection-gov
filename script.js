@@ -14,10 +14,35 @@ const ADMIN_CREDENTIALS = {
     password: 'admin123'
 };
 
+// Test data for quick seeding (developer tool)
+const TEST_DATA_SAMPLES = [
+    {
+        location: "Gandhi Street, Ward 15, Near Bus Stand",
+        description: "Sewage water overflowing from manhole causing unhygienic conditions. The issue has persisted for 3 days and affecting nearby residents.",
+        contact: "9876543210"
+    },
+    {
+        location: "Bharathi Nagar Main Road, Ward 8",
+        description: "Broken underground sewage pipe causing water stagnation. Strong odor and breeding mosquitoes in the area.",
+        contact: "9988776655"
+    },
+    {
+        location: "Nehru Street, Corner of Station Road, Ward 22",
+        description: "Clogged drainage system causing sewage backup during rain. Water entering residential properties.",
+        contact: "9123456789"
+    },
+    {
+        location: "Kamaraj Salai, Behind Market Complex, Ward 12",
+        description: "Open sewage drain without proper cover. Safety hazard for pedestrians and children playing nearby.",
+        contact: "9445566778"
+    }
+];
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
     loadComplaintsFromStorage();
     setupEventListeners();
+    setupDeveloperTools();
 
     // Check if admin is logged in
     const adminLoggedIn = sessionStorage.getItem('adminLoggedIn');
@@ -492,6 +517,113 @@ function viewComplaint(index) {
 
 function closeViewModal() {
     document.getElementById('view-complaint-modal').classList.remove('active');
+}
+
+// ============ DEVELOPER TOOLS ============
+
+function setupDeveloperTools() {
+    // Create developer button for test data seeding
+    createDevSeedButton();
+
+    // Setup keyboard shortcut (Ctrl/Cmd + Shift + D)
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+            e.preventDefault();
+            seedTestData();
+        }
+    });
+
+    // Check for URL parameter to auto-seed
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('seed') === 'true' || urlParams.get('dev') === 'true') {
+        seedTestData();
+    }
+}
+
+function createDevSeedButton() {
+    // Only create button in public view
+    const publicView = document.getElementById('public-view');
+    if (!publicView) return;
+
+    // Create small, unobtrusive button
+    const button = document.createElement('button');
+    button.id = 'dev-seed-btn';
+    button.innerHTML = '🔧';
+    button.title = 'Developer Tool: Seed Test Data (Ctrl+Shift+D)';
+    button.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: white;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        transition: all 0.3s ease;
+        opacity: 0.7;
+    `;
+
+    // Hover effect
+    button.addEventListener('mouseenter', () => {
+        button.style.opacity = '1';
+        button.style.transform = 'scale(1.1)';
+    });
+
+    button.addEventListener('mouseleave', () => {
+        button.style.opacity = '0.7';
+        button.style.transform = 'scale(1)';
+    });
+
+    // Click handler
+    button.addEventListener('click', () => {
+        seedTestData();
+    });
+
+    // Add to body
+    document.body.appendChild(button);
+
+    // Hide button when not in public view
+    const observer = new MutationObserver(() => {
+        const isPublicViewVisible = publicView.style.display !== 'none';
+        button.style.display = isPublicViewVisible ? 'block' : 'none';
+    });
+
+    observer.observe(publicView, { attributes: true, attributeFilter: ['style'] });
+}
+
+function seedTestData() {
+    // Check if we're in the public view
+    const publicView = document.getElementById('public-view');
+    if (!publicView || publicView.style.display === 'none') {
+        return;
+    }
+
+    // Get a random sample from test data
+    const sample = TEST_DATA_SAMPLES[Math.floor(Math.random() * TEST_DATA_SAMPLES.length)];
+
+    // Fill the form fields
+    document.getElementById('complaint-location').value = sample.location;
+    document.getElementById('complaint-description').value = sample.description;
+    document.getElementById('complaint-contact').value = sample.contact;
+
+    // Show visual feedback
+    showNotification('Test data loaded! Remember to upload an image before submitting.');
+
+    // Add a subtle highlight animation to the filled fields
+    const fields = ['complaint-location', 'complaint-description', 'complaint-contact'];
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        field.style.transition = 'background-color 0.5s ease';
+        field.style.backgroundColor = '#dbeafe';
+        setTimeout(() => {
+            field.style.backgroundColor = '';
+        }, 1000);
+    });
 }
 
 // ============ UTILITY FUNCTIONS ============
