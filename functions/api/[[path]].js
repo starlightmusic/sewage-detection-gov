@@ -88,10 +88,10 @@ async function handleHealthCheck(request, env) {
       DB: env.DB ? 'configured' : 'missing',
       ImageStore: env.ImageStore ? 'configured' : 'missing',
     },
+    r2_public_url: 'https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev (hardcoded)',
     env_vars: {
       ADMIN_USERNAME: env.ADMIN_USERNAME ? 'set' : 'missing',
       ADMIN_PASSWORD: env.ADMIN_PASSWORD ? 'set' : 'missing',
-      R2_PUBLIC_URL: env.R2_PUBLIC_URL ? 'set' : 'missing',
     }
   };
 
@@ -249,7 +249,7 @@ async function handleCreateComplaint(request, env) {
     });
 
     // Construct public URL for the image
-    const imageUrl = `${env.R2_PUBLIC_URL}/${fileName}`;
+    const imageUrl = `https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev/${fileName}`;
 
     console.log('Image uploaded successfully:', imageUrl);
     console.log('Inserting complaint into D1 database');
@@ -340,7 +340,7 @@ async function handleUpdateComplaint(request, env, id) {
         },
       });
 
-      afterImageUrl = `${env.R2_PUBLIC_URL}/${fileName}`;
+      afterImageUrl = `https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev/${fileName}`;
       updateFields.push('after_image_url = ?');
       values.push(afterImageUrl);
     }

@@ -51,8 +51,6 @@ npx wrangler r2 bucket create gov-complaint-images
 
 ## Step 3: Set Environment Variables
 
-⚠️ **CRITICAL**: The R2_PUBLIC_URL must be set as an environment variable in Cloudflare Pages. The value in `wrangler.toml` only works for local development!
-
 In your Cloudflare Pages dashboard:
 
 1. Go to your Pages project settings
@@ -60,13 +58,12 @@ In your Cloudflare Pages dashboard:
 3. Add the following variables for **Production** environment:
 
 ```
-R2_PUBLIC_URL=https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=[your-secure-password]
 DEV_PASSWORD=[your-dev-portal-password]
 ```
 
-**Without R2_PUBLIC_URL, images will not display in the admin portal!**
+**Note:** The R2 public URL (`https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev`) is hardcoded in the application and does not need to be set as an environment variable.
 
 ## Step 4: Configure Bindings
 
@@ -104,8 +101,9 @@ cat > .dev.vars << EOF
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=admin123
 DEV_PASSWORD=dev123
-R2_PUBLIC_URL=https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev
 EOF
+
+# Note: R2 public URL is hardcoded in the application
 
 # Run local development server with bindings
 npx wrangler pages dev . --d1 DB=complaints_db --r2 ImageStore=gov-complaint-images
@@ -141,13 +139,15 @@ npx wrangler pages dev . --d1 DB=complaints_db --r2 ImageStore=gov-complaint-ima
 
 ### Images Not Showing in Admin Portal
 
-**Cause:** R2_PUBLIC_URL environment variable not set or complaints created before it was configured
+**Cause:** R2 bucket public access not enabled or images failed to upload
 
 **Solution:**
-1. **Verify environment variable:**
-   - Go to Cloudflare Pages > Settings > Environment variables
-   - Ensure `R2_PUBLIC_URL=https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev` is set for Production
-   - Click "Save" and redeploy your site
+1. **Verify R2 bucket public access:**
+   - Go to Cloudflare Dashboard > R2
+   - Click on bucket: `gov-complaint-images`
+   - Go to Settings > Public Access
+   - Ensure public access is enabled
+   - Public URL should be: `https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev`
 
 2. **Use diagnostic tool:**
    - Visit `https://your-site.pages.dev/diagnostic.html`
@@ -163,17 +163,19 @@ npx wrangler pages dev . --d1 DB=complaints_db --r2 ImageStore=gov-complaint-ima
      Viewing complaint: { beforeImage: "...", afterImage: "..." }
      Before image loaded successfully: https://pub-62cfd0f5ce354768976829718b8e95cd.r2.dev/...
      ```
-   - If URLs are missing or incorrect, the R2_PUBLIC_URL wasn't set when complaints were created
+   - If URLs are missing, the image upload failed
 
 4. **Test image URL directly:**
    - Copy an image URL from the console logs
    - Open it in a new browser tab
-   - If you get 403 Forbidden, ensure R2 bucket has public access enabled
-   - If you get 404 Not Found, the image wasn't uploaded correctly
+   - If you get 403 Forbidden, enable R2 bucket public access
+   - If you get 404 Not Found, the image wasn't uploaded to R2
 
-5. **If old complaints have wrong URLs:**
-   - Option A: Delete old test complaints and create new ones
-   - Option B: Manually update URLs in database (advanced)
+5. **Verify R2 binding:**
+   - Go to Cloudflare Pages > Settings > Functions
+   - Ensure R2 bucket binding exists:
+     - Variable name: `ImageStore`
+     - R2 bucket: `gov-complaint-images`
 
 ## Testing the Deployment
 
